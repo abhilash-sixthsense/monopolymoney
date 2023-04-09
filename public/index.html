@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Monopoly</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- This is a development version of Vue.js! -->
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+
+        <!-- Google fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    </head>
+
+    <!-- Components -->
+    <div class="container ">
+
+        <div id="app_component" class="experiment-block">
+            <div class="row mb-3 mt-3">
+                <button class="btn btn-primary" v-if="!isGameStarted" @click="toggleGameState()">Start Game
+                </button>
+                <button class="btn btn-danger" v-else data-bs-toggle="modal" data-bs-target="#confirmationModal">Stop
+                    Game</button>
+                <h2>
+                    <span class="badge bg-warning text-dark" v-if="isGameStarted">{{elapsedTime}}</span>
+
+                </h2>
+            </div>
+            <div v-if="isGameStarted">
+                <table border=" 1" class="table  table-striped  fs-2">
+                    <tr>
+                        <th>Balance</th>
+                        <th>From</th>
+                        <th>To</th>
+                    </tr>
+                    <tr class="m-3">
+                        <td>
+                            {{balance['achan']}}
+                        </td>
+                        <td>
+                            <input type="radio" v-model="from" value="achan" name="from" class="btn-check"
+                                id="achanFrom">
+                            <label class="btn btn-outline-primary" for="achanFrom">Achan</label><br>
+
+                        </td>
+                        <td>
+                            <span v-if="from != 'achan'">
+                                <input type="radio" v-model="to" value="achan" name="to" class="btn-check" id="achanTo">
+                                <label class="btn btn-outline-success" for="achanTo">Achan</label><br>
+                            </span>
+
+                        </td>
+                    </tr>
+                    <tr class="m-3">
+                        <td>
+                            {{balance['kunju']}}
+                        </td>
+                        <td>
+                            <input type="radio" v-model="from" value="kunju" name="from" class="btn-check"
+                                id="fromKunju">
+                            <label class="btn btn-outline-primary" for="fromKunju">Kunju</label><br>
+                        </td>
+                        <td>
+                            <span v-if="from != 'kunju'">
+                                <input type="radio" v-model="to" value="kunju" name="to" class="btn-check" id="toKunju">
+                                <label class="btn btn-outline-success" for="toKunju">Kunju</label><br></span>
+
+                        </td>
+                    </tr>
+                    <tr class="m-3">
+                        <td>
+                            {{balance['ammu']}}
+
+                        </td>
+                        <td>
+                            <input type="radio" v-model="from" value="ammu" name="from" class="btn-check" id="fromAmmu">
+                            <label class="btn btn-outline-primary" for="fromAmmu">Ammu</label><br>
+
+                        </td>
+                        <td>
+                            <span v-if="from != 'ammu'"><input type="radio" v-model="to" value="ammu" name="to"
+                                    class="btn-check" id="toAmmu">
+                                <label class="btn btn-outline-success" for="toAmmu">Ammu</label>
+                            </span>
+                        </td>
+                    </tr>
+                    <tr class="m-3">
+                        <td>
+
+                        </td>
+                        <td>
+
+                            <input type="radio" v-model="from" value="bank" name="from" class="btn-check" id="fromBank">
+                            <label class="btn btn-outline-primary" for="fromBank">Bank</label><br>
+
+                        </td>
+                        <td>
+                            <span v-if="from != 'bank'"><input type="radio" v-model="to" value="bank" name="to"
+                                    class="btn-check" id="toBank"><label class="btn btn-outline-success"
+                                    for="toBank">Bank</label>
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+                <div v-if="from && to && from!=to">
+                    <span class="badge bg-primary" style="font-size: larger;"> {{from}} </span>
+                    ->
+                    <span class="badge bg-success" style="font-size: larger;">{{to}} </span>
+                </div>
+
+
+                <br>
+                <span v-if="to !=null && from !=null && from !=to">
+                    <input v-model.number='amount' type="number" class="me-2">
+                    <button v-if="amount>0" value="" v-on:click="pay" class="btn btn-primary btn-lg">Pay</button>
+                </span>
+                <br>
+                <br>
+                <br><br>
+                <table class="table table-striped">
+                    <tr>
+                        <th>Logs</th>
+                    </tr>
+                    <!-- <tr v-for="log in logs">
+                        <td>{{log}}</td>
+
+                    </tr> -->
+                </table>
+                <ol reversed>
+                    <li v-for="log in logs">
+                        {{log}}
+
+                    </li>
+                </ol>
+
+                <!-- Modal -->
+                <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModal"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="confirmationModalLabel">Really Stop game?</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                                    @click="toggleGameState()">Stop
+                                    Game</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </body>
+    <script>
+
+        new Vue({
+            el: "#app_component",
+            data: {
+                initial_balance: {
+                    'ammu': 2500,
+                    'achan': 2500,
+                    'kunju': 2500,
+                    'bank': 250000000
+                },
+                balance: {
+                    'ammu': 2500,
+                    'achan': 2500,
+                    'kunju': 2500,
+                    'bank': 250000000
+                },
+                amount: 0,
+                from: null,
+                to: null,
+                // from: 'kunju',
+                // to: 'achan'
+                logs: [],
+                isGameStarted: false,
+                gameStartedTimestamp: new Date(),
+                elapsedTime: ''
+            },
+            methods: {
+                setFrom(from) {
+                    this.from = from
+                },
+                setTo(to) {
+                    this.to = to
+                },
+                pay() {
+                    console.log(this.balance)
+                    console.log(typeof this.amount, 'amount')
+                    if (this.from != 'bank') {
+                        this.balance[this.from] = this.balance[this.from] - this.amount.toString()
+                    }
+                    if (this.to != 'bank') {
+                        this.balance[this.to] = this.balance[this.to] + this.amount
+                    }
+                    this.logs.splice(0, 0, this.from + ' payed ' + this.amount.toString() + ' to ' + this.to)
+                    this.to = this.from = null
+                    this.amount = ''
+                },
+                toggleGameState() {
+                    console.log('Called')
+
+                    this.isGameStarted = !this.isGameStarted
+                    if (this.isGameStarted) {
+                        this.gameStartedTimestamp = new Date()
+                        this.logs = []
+                    }
+                    this.balance = { ...this.initial_balance }
+                },
+                getNow: function () {
+                    if (this.isGameStarted) {
+                        console.log('Inside getNow')
+                        const now = new Date();
+                        var diffMs = (now - this.gameStartedTimestamp); // milliseconds between now & Christmas
+                        var diffDays = Math.floor(diffMs / 86400000); // days
+                        var diffHrs = Math.floor((diffMs % 86400000) / 3600000); // hours
+                        var diffMins = Math.round(((diffMs % 86400000) % 3600000) / 60000); // minutes
+                        console.log(diffMs, "diffMs");
+                        this.elapsedTime = diffHrs + " : " + diffMins + " : " + Math.round((((diffMs % 86400000) % 3600000) % 60000) / 1000)
+                    }
+                }
+            },
+            computed: {
+            },
+            created() {
+                setInterval(this.getNow, 1000);
+            },
+
+        })
+
+
+    </script>
+
+</html>
